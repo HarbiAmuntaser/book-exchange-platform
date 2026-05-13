@@ -17,13 +17,20 @@ ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 UNIVERSITY_EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@nu\.edu\.sa$")
 PASSWORD_PATTERN = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_\-#])[A-Za-z\d@$!%*?&_\-#]{8,}$")
 
+import os
+import mysql.connector
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "book_exchange_db"),
+    "host": os.getenv("DB_HOST"),
+    "port": int(os.getenv("DB_PORT", "3306")),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
     "charset": "utf8mb4",
     "use_unicode": True,
+    "ssl_ca": os.path.join(BASE_DIR, "ca.pem"),
 }
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -31,7 +38,6 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
-
 
 def fetch_all(query, params=()):
     connection = None
